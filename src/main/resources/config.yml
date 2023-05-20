@@ -8,15 +8,15 @@ current-game-index: 1
 # Modify users storage settings
 storage: local # Can be either 'local' or 'mongo'
 mongo: # Only modify these settings if you set storage above to 'mongo'
-  ip: "cluster-1.dmlubok.mongodb.net"
-  port: "27017"
-  user: "hexilionminecraft"
-  database: "hexilionland"
-  password: "1zH4kQsaxhMPEwAs"
-  users-collection: "dodgeball_users"
+  ip: ""
+  port: ""
+  user: ""
+  database: ""
+  password: ""
+  users-collection: ""
   connection-string: # Only enable a forced connection string if you know what you are doing
-    use: true
-    forced-string: "mongodb+srv://{user}:{password}@{ip}/{database}?retryWrites=true&w=majority" # You can use {ip}, {port}, {user}, {database} and {password} in the forced string
+    use: false
+    forced-string: "" # You can use {ip}, {port}, {user}, {database} and {password} in the forced string
 
 # Modify game specifc settings.
 game:

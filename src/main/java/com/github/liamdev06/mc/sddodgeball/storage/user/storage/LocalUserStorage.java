@@ -1,7 +1,6 @@
 package com.github.liamdev06.mc.sddodgeball.storage.user.storage;
 
 import com.github.liamdev06.mc.sddodgeball.DodgeballPlugin;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import com.github.liamdev06.mc.sddodgeball.storage.GameFileStorage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -81,10 +80,12 @@ public class LocalUserStorage implements IUserStorage {
     }
 
     @Override
-    public void saveUsersToStorage() {
-        for (User user : this.users.values()) {
-            this.saveUserToStorage(user.getUuid());
-        }
+    public CompletableFuture<Void> saveUsersToStorage() {
+        return CompletableFuture.runAsync(() -> {
+            for (User user : this.users.values()) {
+                this.saveUserToStorage(user.getUuid());
+            }
+        }, Runnable::run);
     }
 
     @Override

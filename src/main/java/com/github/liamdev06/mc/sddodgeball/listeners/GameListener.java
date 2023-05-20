@@ -9,7 +9,7 @@ import com.github.liamdev06.mc.sddodgeball.game.enums.GameState;
 import com.github.liamdev06.mc.sddodgeball.game.enums.GameTeam;
 import com.github.liamdev06.mc.sddodgeball.storage.GameFileStorage;
 import com.github.liamdev06.mc.sddodgeball.game.GameHelper;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
+import com.github.liamdev06.mc.sddodgeball.storage.user.storage.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import com.github.liamdev06.mc.sddodgeball.utility.DefaultSound;
 import com.github.liamdev06.mc.sddodgeball.game.PlayerSpawner;
@@ -21,18 +21,21 @@ import com.github.liamdev06.mc.sddodgeball.utility.messaging.lang.MessageHelper;
 import com.github.liamdev06.mc.sddodgeball.utility.messaging.lang.MsgReplace;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -76,7 +79,7 @@ public class GameListener implements Listener {
         final Player player = event.getPlayer();
 
         // Check if the player joined a game
-        Bukkit.getScheduler().runTaskLater(this.plugin, () ->{
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             Game game = GameHelper.getGameFromPlayer(player);
             if (game == null) {
                 return;
@@ -90,27 +93,28 @@ public class GameListener implements Listener {
             List<Player> players = world.getPlayers();
 
             // The player left the game
+            GameState gameState = game.getGameState();
             if (event.getFrom().getName().equals(game.getWorldName())) {
                 this.callGameLeaveActions(player, game);
                 return;
             }
 
-            // The player joined the game
-            for (Player target : players) {
-                MessageHelper.sendMessage(target, "join-game.announce-join", replacements);
-            }
-
             // Check if we can start the countdown timer
             int playersSize = game.getPlayers().size();
-            if (playersSize >= this.config.getInt("game.players-to-start-timer")) {
+            if (gameState == GameState.PRE_WAITING && playersSize >= this.config.getInt("game.players-to-start-timer")) {
                 game.setDelayedGameState(GameState.WAITING, 2);
             }
 
-            // Check if start full game
-            if (playersSize >= this.config.getInt("game.max-players")) {
-                game.setDelayedGameState(GameState.ACTIVE, 2);
-            }
+            // The player joined the game
+            if (gameState.isWaiting()) {
+                if (playersSize >= this.config.getInt("game.max-players")) {
+                    game.setDelayedGameState(GameState.ACTIVE, 2);
+                }
 
+                for (Player target : players) {
+                    MessageHelper.sendMessage(target, "join-game.announce-join", replacements);
+                }
+            }
             SoundHelper.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING);
         }, 4);
     }
@@ -118,22 +122,35 @@ public class GameListener implements Listener {
     private void callGameLeaveActions(@NonNull Player player, @NonNull Game game) {
         MsgReplace[] replacements = {
                 new MsgReplace("player", player.getName()),
-                new MsgReplace("players_joined", game.getPlayers().size())
+                new MsgReplace("players_joined", game.getPlayers().size() - 1)
         };
 
         GamePlayer gamePlayer = game.getGamePlayer(player);
         gamePlayer.getTeam().removeAlivePlayer(player.getUniqueId());
 
+        GameState gameState = game.getGameState();
         for (GamePlayer targetGamePlayer : game.getPlayers()) {
             Player targetPlayer = targetGamePlayer.toPlayer();
             if (targetPlayer == null) {
                 continue;
             }
 
-            MessageHelper.sendMessage(targetPlayer, "join-game.announce-quit", replacements);
+            if (gameState.isWaiting()) {
+                MessageHelper.sendMessage(targetPlayer, "join-game.announce-quit", replacements);
+            }
         }
 
         game.removePlayer(player);
+
+        // Check if one team has no alive players left
+        if (gameState == GameState.ACTIVE) {
+            for (GameTeam team : game.getPlayableTeams()) {
+                if (team.getAlivePlayers().size() == 0) {
+                    game.setDelayedGameState(GameState.END, 3);
+                    break;
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -172,6 +189,20 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
+    public void onItemPickup(EntityPickupItemEvent event) {
+        final Item item = event.getItem();
+        if (event.getEntity() instanceof Player player && item instanceof Snowball) {
+            // Get the game
+            Game game = GameHelper.getGameFromPlayer(player);
+            if (game == null) {
+                return;
+            }
+
+            game.removeSnowball(item);
+        }
+    }
+
+    @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Snowball snowball && snowball.getShooter() instanceof Player shooter) {
             // Get the game
@@ -185,8 +216,9 @@ public class GameListener implements Listener {
             if (hitBlock != null) {
                 ItemStack snowballItem = new ItemStack(Material.SNOWBALL, 1);
 
-                // Drop the snowball where it landed
-                snowball.getWorld().dropItemNaturally(snowball.getLocation(), snowballItem);
+                // Drop the snowball where it landed and store it
+                Item itemEntity = snowball.getWorld().dropItemNaturally(snowball.getLocation(), snowballItem);
+                game.addSnowball(itemEntity);
 
                 // Remove the snowball entity
                 snowball.remove();
@@ -228,6 +260,16 @@ public class GameListener implements Listener {
                 if (hitTeam.getAlivePlayers().size() == 0) {
                     game.setDelayedGameState(GameState.END, 3);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Firework firework) {
+            // Do not cause damage if the firework is used as a victory effect
+            if (firework.hasMetadata("victory_nodamage")) {
+                event.setCancelled(true);
             }
         }
     }
@@ -290,7 +332,9 @@ public class GameListener implements Listener {
             return;
         }
 
-        for (GamePlayer gamePlayer : game.getPlayers()) {
+        // Send sound and title
+        List<GamePlayer> players = game.getPlayers();
+        for (GamePlayer gamePlayer : players) {
             Player player = gamePlayer.toPlayer();
             if (player == null) {
                 continue;
@@ -300,6 +344,7 @@ public class GameListener implements Listener {
             MessageHelper.sendTitle(player, "game.victory-title", "game.victory-subtitle", new MsgReplace("winning_team", winningTeam.getDisplayName()));
         }
 
+        // Spawn visual effects
         for (UUID uuid : winningTeam.getAlivePlayers()) {
             Player target = Bukkit.getPlayer(uuid);
             if (target == null) {
@@ -311,12 +356,19 @@ public class GameListener implements Listener {
             this.showVictoryParticles(location);
         }
 
+        // Send configuration commands
+        ConsoleCommandSender sender = Bukkit.getConsoleSender();
         for (String command : this.config.getStringList("game.victory.commands")) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("/", ""));
+            Bukkit.dispatchCommand(sender, command.replace("/", ""));
+        }
+
+        // Clean up snowballs
+        for (Item snowball : game.getSnowballs()) {
+            snowball.remove();
         }
 
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
-            for (GamePlayer gamePlayer : game.getPlayers()) {
+            for (GamePlayer gamePlayer : players) {
                 Player player = gamePlayer.toPlayer();
                 if (player == null) {
                     continue;
@@ -329,8 +381,8 @@ public class GameListener implements Listener {
                     player.teleport(location);
                 }
 
-                game.resetWaitingCountdown();
-                game.setGameState(GameState.PRE_WAITING);
+                // Reset game options
+                game.resetValues();
             }
         }, 20 * 6);
     }
@@ -342,6 +394,7 @@ public class GameListener implements Listener {
         }
 
         Firework firework = world.spawn(location, Firework.class);
+        firework.setMetadata("victory_nodamage", new FixedMetadataValue(this.plugin, true)); // Used so the firework does not damage the player
         FireworkMeta fireworkMeta = firework.getFireworkMeta();
         fireworkMeta.addEffect(FireworkEffect.builder()
                 .withColor(Color.GREEN)
@@ -430,7 +483,7 @@ public class GameListener implements Listener {
             String gameTeamId = gamePlayer.getTeam().getId();
             if (teamOneSize < teamTwoSize && gameTeamId.equals(teamOne.getId())) {
                 player.addPotionEffect(speedEffect);
-            } else if (teamTwoIndex > teamOneIndex && gameTeamId.equals(teamTwo.getId())) {
+            } else if (teamTwoSize > teamOneSize && gameTeamId.equals(teamTwo.getId())) {
                 // Team two is 1 less player than team one, give them a small speed boost as an extra perk
                 player.addPotionEffect(speedEffect);
             }
@@ -480,6 +533,27 @@ public class GameListener implements Listener {
         this.lastLocation.put(uuid, location);
     }
 
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            if (this.isGameWorld(player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onWeatherChange(WeatherChangeEvent event) {
+        World world = event.getWorld();
+
+        // Stop weather changing in the game world
+        for (Game game : this.plugin.getGames().values()) {
+            if (game.getWorldName().equals(world.getName())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     /**
      * Checks if the base location can be found inside of the cuboid
      * generated by loc1 and loc2.
@@ -497,5 +571,18 @@ public class GameListener implements Listener {
         int y2 = Math.max(loc1.getBlockY(), loc2.getBlockY());
         int z2 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
         return (base.getBlockX() >= x1 && base.getBlockX() <= x2 && base.getBlockY() >= y1 && base.getBlockY() <= y2 && base.getBlockZ() >= z1 && base.getBlockZ() <= z2);
+    }
+
+    /**
+     * @param player An online player to check for.
+     * @return If the player is in a game world.
+     */
+    private boolean isGameWorld(@NonNull Player player) {
+        Game game = GameHelper.getGameFromPlayer(player);
+        if (game == null) {
+            return false;
+        }
+
+        return player.getWorld().getName().equalsIgnoreCase(game.getWorldName());
     }
 }

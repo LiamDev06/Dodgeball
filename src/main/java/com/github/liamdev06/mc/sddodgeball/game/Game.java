@@ -10,6 +10,7 @@ import com.github.liamdev06.mc.sddodgeball.utility.messaging.LibColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -28,6 +29,7 @@ public class Game {
     private final @NonNull Set<GameTeam> teams;
     private final @NonNull List<GamePlayer> players;
     private final @NonNull Map<UUID, FastBoard> fastBoards;
+    private final @NonNull List<Item> snowballs;
     private @NonNull GameState gameState;
     private final @NonNull String worldName, gameId;
     private Location waitingLobbySpawn;
@@ -44,6 +46,7 @@ public class Game {
         this.gameState = GameState.SETUP;
         this.worldName = worldName;
         this.waitingCountdown = this.config.getInt("game.waiting-timer");
+        this.snowballs = new ArrayList<>();
 
         // Create a new team for spectators and none
         this.teams.add(new GameTeam("none", "N/A", ChatColor.GRAY, "&7&lN/A", false));
@@ -95,9 +98,8 @@ public class Game {
         }
 
         // Check if go back to pre-waiting
-        if (this.players.size() < this.config.getInt("game.players-to-start-timer")) {
-            this.setGameState(GameState.PRE_WAITING);
-            this.resetWaitingCountdown();
+        if (this.gameState == GameState.WAITING && this.players.size() < this.config.getInt("game.players-to-start-timer")) {
+            this.resetValues();
         }
     }
 
@@ -278,8 +280,30 @@ public class Game {
         this.waitingCountdown = this.config.getInt("game.waiting-timer");
     }
 
+    public void resetValues() {
+        this.resetWaitingCountdown();
+        this.setDelayedGameState(GameState.PRE_WAITING, 3);
+        this.clearSnowballs();
+    }
+
+    public void clearSnowballs() {
+        this.snowballs.clear();
+    }
+
     public @NonNull String getWorldName() {
         return this.worldName;
+    }
+
+    public void addSnowball(@NonNull Item item) {
+        this.snowballs.add(item);
+    }
+
+    public void removeSnowball(@NonNull Item item) {
+        this.snowballs.remove(item);
+    }
+
+    public @NonNull List<Item> getSnowballs() {
+        return this.snowballs;
     }
 
     public @NonNull DodgeballPlugin getPlugin() {

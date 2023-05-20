@@ -1,5 +1,6 @@
-package com.github.liamdev06.mc.sddodgeball.storage.user;
+package com.github.liamdev06.mc.sddodgeball.storage.user.storage;
 
+import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -22,7 +23,7 @@ public interface IUserStorage {
 
     void saveUserToStorage(@NonNull UUID uuid);
 
-    void saveUsersToStorage();
+    CompletableFuture<Void> saveUsersToStorage();
 
     CompletableFuture<User> loadUserFromStorage(@NonNull UUID uuid);
 

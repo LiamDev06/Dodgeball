@@ -1,7 +1,6 @@
 package com.github.liamdev06.mc.sddodgeball.storage.user.storage;
 
 import com.github.liamdev06.mc.sddodgeball.DodgeballPlugin;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import com.github.liamdev06.mc.sddodgeball.storage.GameFileStorage;
 import com.mongodb.ConnectionString;
@@ -32,7 +31,7 @@ public class MongoUserStorage implements IUserStorage {
 
     public MongoUserStorage(@NonNull DodgeballPlugin plugin, @NonNull MongoCredentials credentials) {
         this.users = new HashMap<>();
-        GameFileStorage config = plugin.getLobbyConfig();
+        GameFileStorage config = plugin.getPluginConfig();
 
         // Connect to the database
         String connectionUri = String.format("mongodb://%s:%s@%s:%s/%s?retryWrites=true&w=majority",
@@ -53,6 +52,7 @@ public class MongoUserStorage implements IUserStorage {
 
         ConnectionString connectionString = new ConnectionString(connectionUri);
         MongoClientSettings clientSettings = MongoClientSettings.builder()
+                .applicationName("Dodgeball")
                 .applyConnectionString(connectionString)
                 .build();
 
@@ -139,10 +139,12 @@ public class MongoUserStorage implements IUserStorage {
     }
 
     @Override
-    public void saveUsersToStorage() {
-        for (User user : this.users.values()) {
-            this.saveUserToStorage(user.getUuid());
-        }
+    public CompletableFuture<Void> saveUsersToStorage() {
+        return CompletableFuture.runAsync(() -> {
+            for (User user : this.users.values()) {
+                this.saveUserToStorage(user.getUuid());
+            }
+        });
     }
 
     @Override

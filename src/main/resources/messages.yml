@@ -19,6 +19,7 @@ command:
 # Messages used when trying to join a game.
 join-game:
   no-games-available: "&c&lNO GAMES! &cThere are no games available to join at the moment."
+  already-in-game: "&c&lALREADY PLAYING! &cYou cannot join a game while you are already in one."
   game-found: "&7Found a game, joining it..."
   announce-join: "&a{player}&e joined the game &7(&f{players_joined}&7/&f20&7)"
   announce-quit: "&a{player}&e left the game &7(&f{players_joined}&7/&f20&7)"

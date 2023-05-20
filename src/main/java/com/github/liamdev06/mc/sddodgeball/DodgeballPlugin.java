@@ -7,7 +7,7 @@ import com.github.liamdev06.mc.sddodgeball.game.enums.GameTeam;
 import com.github.liamdev06.mc.sddodgeball.managers.world.WorldManager;
 import com.github.liamdev06.mc.sddodgeball.tickhandler.RunnableManager;
 import com.github.liamdev06.mc.sddodgeball.storage.user.storage.LocalUserStorage;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
+import com.github.liamdev06.mc.sddodgeball.storage.user.storage.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.storage.MongoCredentials;
 import com.github.liamdev06.mc.sddodgeball.storage.user.storage.MongoUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.GameFileStorage;
@@ -152,21 +152,20 @@ public final class DodgeballPlugin extends JavaPlugin {
         if (this.userStorage == null) {
             log.severe("There is no instance of the UserManager class! Users could not be saved to the storage!");
         } else {
-            this.userStorage.saveUsersToStorage();
-            log.info("All users were saved to storage.");
+            this.userStorage.saveUsersToStorage().thenRun(() -> {
+                this.userStorage.handleShutdown();
+                log.info("All users have been saved to storage.");
+            });
         }
 
         // Save all games to storage
         if (this.games != null) {
             for (Game game : this.games.values()) {
+                game.clearSnowballs();
                 this.saveGameToStorage(game);
             }
         }
-
         this.gameStorage.save();
-
-        // Shutdown user storing
-        this.userStorage.handleShutdown();
 
         // Plugin shutdown done
         INSTANCE = null;

@@ -2,7 +2,7 @@ package com.github.liamdev06.mc.sddodgeball.listeners;
 
 import com.github.liamdev06.mc.sddodgeball.DodgeballPlugin;
 import com.github.liamdev06.mc.sddodgeball.game.Game;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
+import com.github.liamdev06.mc.sddodgeball.storage.user.storage.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.GameFileStorage;
 import com.github.liamdev06.mc.sddodgeball.game.setup.GameSetupHelper;
 import com.github.liamdev06.mc.sddodgeball.utility.PermissionHelper;

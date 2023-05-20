@@ -2,7 +2,7 @@ package com.github.liamdev06.mc.sddodgeball.game.setup;
 
 import com.github.liamdev06.mc.sddodgeball.DodgeballPlugin;
 import com.github.liamdev06.mc.sddodgeball.game.Game;
-import com.github.liamdev06.mc.sddodgeball.storage.user.IUserStorage;
+import com.github.liamdev06.mc.sddodgeball.storage.user.storage.IUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.MetadataValues;
 import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import com.github.liamdev06.mc.sddodgeball.utility.messaging.LibColor;

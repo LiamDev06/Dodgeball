@@ -8,14 +8,14 @@ current-game-index: 1
 # Modify users storage settings
 storage: local # Can be either 'local' or 'mongo'
 mongo: # Only modify these settings if you set storage above to 'mongo'
-  ip: "cluster-1.dmlubok.mongodb.net"
-  port: "27017"
-  user: "hexilionminecraft"
-  database: "hexilionland"
-  password: "1zH4kQsaxhMPEwAs"
-  users-collection: "dodgeball_users"
+  ip: ""
+  port: ""
+  user: ""
+  database: ""
+  password: ""
+  users-collection: ""
   connection-string: # Only enable a forced connection string if you know what you are doing
-    use: true
+    use: false
     forced-string: "mongodb+srv://{user}:{password}@{ip}/{database}?retryWrites=true&w=majority" # You can use {ip}, {port}, {user}, {database} and {password} in the forced string
 
 # Modify game specifc settings.
@@ -23,7 +23,7 @@ game:
   max-players: 20 # Max players in a game.
   players-to-start-timer: 2 # The amount of players required for when the countdown timer starts
   waiting-timer: 15 # In seconds
-  snowballs-start-amount: 15 # How many snow balls each player should start with.
+  snowballs-start-amount: 15 # How many snowballs each player should start with.
   victory-commands: # These commands will be performed on victory
     - ""
   coins-on-kill: 50 # How much coins a player receives when getting a kill (hitting a player)

@@ -84,6 +84,7 @@ public class Game {
         // Get the game player and remove
         GamePlayer gamePlayer = this.getGamePlayer(player);
         this.players.remove(gamePlayer);
+        gamePlayer.resetBukkitValues();
 
         // Clear scoreboard
         if (this.fastBoards.containsKey(uuid)) {

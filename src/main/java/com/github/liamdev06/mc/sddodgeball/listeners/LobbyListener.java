@@ -69,7 +69,7 @@ public class LobbyListener implements Listener {
             }
 
             // If scoreboard is enabled, create a new scoreboard for the player and set it
-            if (this.scoreboardManager.isLobbyScoreboardEnabled()) {
+            if (this.scoreboardManager.isLobbyScoreboardEnabled() && this.isInLobbyWorld(player)) {
                 this.scoreboardManager.applyLobbyScoreboard(player);
             }
         }, 4);

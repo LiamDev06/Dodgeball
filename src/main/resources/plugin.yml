@@ -1,0 +1,8 @@
+name: "${project.name}"
+version: "${project.version}"
+main: com.github.liamdev06.mc.sddodgeball.DodgeballPlugin
+api-version: 1.19
+author: Liam
+description: Dodgeball Minigame plugin developer test at SpaceDelta.
+loadbefore: [PlaceholderAPI]
+depend: [PlaceholderAPI]

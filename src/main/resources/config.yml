@@ -1,0 +1,64 @@
+# --------------------------------------------
+# Edit and modify features general features of the plugin.
+# --------------------------------------------
+
+# DO NOT MODIFY! This is used to ensure each game and game world is given a unique identifier and world name.
+current-game-index: 1
+
+# Modify users storage settings
+storage: local # Can be either 'local' or 'mongo'
+mongo: # Only modify these settings if you set storage above to 'mongo'
+  ip: "cluster-1.dmlubok.mongodb.net"
+  port: "27017"
+  user: "hexilionminecraft"
+  database: "hexilionland"
+  password: "1zH4kQsaxhMPEwAs"
+  users-collection: "dodgeball_users"
+  connection-string: # Only enable a forced connection string if you know what you are doing
+    use: true
+    forced-string: "mongodb+srv://{user}:{password}@{ip}/{database}?retryWrites=true&w=majority" # You can use {ip}, {port}, {user}, {database} and {password} in the forced string
+
+# Modify game specifc settings.
+game:
+  max-players: 20 # Max players in a game.
+  players-to-start-timer: 2 # The amount of players required for when the countdown timer starts
+  waiting-timer: 15 # In seconds
+  snowballs-start-amount: 15 # How many snow balls each player should start with.
+  victory-commands: # These commands will be performed on victory
+    - ""
+  coins-on-kill: 50 # How much coins a player receives when getting a kill (hitting a player)
+  scoreboard:
+    title: "&6❋ &b&lDodgeball City &6❋"
+
+    # Scoreboard used in game waiting stages.
+    waiting-lines:
+      - "&8Dodgeball City by Liam"
+      - ""
+      - "{#09B0F0}● Players » {#DDB21D}{players}"
+      - "{#09B0F0}● Version » {#D6D6D6}1.0.0"
+      - ""
+      - "{#ECE176}play.dodgeballcity.liamcreation"
+
+    # Message replacements/variables available for the scoreboard.
+    # {balls_thrown} - amount of balls thrown by the player (so includes missed ones).
+    # {hits} - amount of hits on a player.
+    # {team_left} - amount of team members left on the player's own team.
+    # {opposite_left} - amount of team members left on the player's opposite team,
+    # {team_prefix} - prefix of the player's own team.
+    # {opposite_prefix} - prefix of the player's opposite own team.
+    # {team_display_name} - display name of the player's own team.
+    # {opposite_display_name} - display name of the player's opposite own team.
+    # {team_color} - color of the player's own team.
+    # {opposite_color} - color of the player's opposite own team.
+    # Scoreboard using during the game when it is active.
+    game-lines:
+      - "&8Dodgeball City by Liam"
+      - ""
+      - "{#09B0F0}● Balls Thrown » {#DDB21D}{balls_thrown}"
+      - "{#09B0F0}● Hits » {#DDB21D}{hits}"
+      - ""
+      - "{#207B13}● {team_prefix} » {#D6D6D6}{team_left}"
+      - "{#207B13}● {opposite_prefix} » {#D6D6D6}{opposite_left}"
+      - ""
+      - "{#ECE176}play.dodgeballcity.liamcreation"
+

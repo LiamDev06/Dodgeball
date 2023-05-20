@@ -1,0 +1,41 @@
+# --------------------------------------------
+# Edit and modify features specific to the lobby.
+# This is not the game waiting lobby, but instead the general server lobby
+# --------------------------------------------
+
+# Environment settings for the lobby.
+environment:
+  lobby: "" # The location of the lobby spawn.
+
+# General settings for the main lobby.
+settings:
+  enable-settings: true # If lobby settings should be controlled by this plugin.
+  on-join: # These values will be applied whenever the player joins the server or the lobby world.
+    teleport-spawn: true # If the player should be teleported to the location at environment.lobby
+    set-gamemode: ADVENTURE
+    set-health: 20
+    set-food: 20
+    clear-inventory: true # True/false
+  allow-hunger: false
+  allow-item-drop: false
+  allow-player-damage: false
+  allow-weather: false
+  allow-block-breaking: false
+  allow-block-placing: false
+
+# Modify the scoreboard for the main lobby.
+# You can use Bukkit color codes and hex colors within the title and lines.
+# Plugin placeholders are also supported.
+scoreboard:
+  enable-scoreboard: true
+  title: "&6❋ &b&lDodgeball City &6❋"
+  lines:
+    - "&8Dodgeball City by Liam"
+    - ""
+    - "{#09B0F0}● Level » {#DDB21D}{level}"
+    - ""
+    - "{#09B0F0}● Coins » {#D6D6D6}{coins}"
+    - "{#09B0F0}● Total Kills » {#D6D6D6}{lifetime_kills}"
+    - "{#09B0F0}● Total Deaths » {#D6D6D6}{lifetime_deaths}"
+    - ""
+    - "{#ECE176}play.dodgeballcity.liamcreation"

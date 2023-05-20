@@ -1,0 +1,44 @@
+# --------------------------------------------
+# Edit messages, titles, action bars and more found in the plugin.
+# If you want to support a new language, you can translate the strings found in here.
+#
+# < IMPORTANT! >
+# The main use of this is to be able to modify messages seen by players, therefor internal/admin messages
+# may not always be modifiable here.
+# --------------------------------------------
+
+# Command messages used throughout the plugin in multiple places.
+command:
+  dbadmin:
+    no-permission: "&c&lNO PERMISSION! &cYou are not allowed to use this command." # If the player does not have permission to execute a command. You can use {permission} to get the permission the player is missing.
+    invalid-argument: "&c&lINVALID SUBCOMMAND! &cYou did not provide a valid argument. Look through the tab completion when using &6/dbadmin&c to see all available subcommands." # The player did not provide a valid argument.
+  dodgeball:
+    no-permission: "&c&lNO PERMISSION! &cYou are not allowed to use this command."
+    invalid-argument: "&c&lINVALID SUBCOMMAND! &cYou did not provide a valid argument. Look through the tab completion when using &6/dodgeball&c to see all available subcommands."
+
+# Messages used when trying to join a game.
+join-game:
+  no-games-available: "&c&lNO GAMES! &cThere are no games available to join at the moment."
+  game-found: "&7Found a game, joining it..."
+  announce-join: "&a{player}&e joined the game &7(&f{players_joined}&7/&f20&7)"
+  announce-quit: "&a{player}&e left the game &7(&f{players_joined}&7/&f20&7)"
+
+# Messages used during games.
+game:
+  starting-in: "&aThe game is starting in: &6{timer}"
+  game-started:
+    message: "&6&l(!) &6The game has started, good luck!"
+    title: "&6&lGAME STARTED"
+    subtitle: "&cMay the best team win!"
+  player-hit: "&2&l(!) &aYou hit &6{hit}&a with your ball!"
+  died: "&4&l(!) &cYou were killed by &6{killer}&c."
+  victory-title: "&6&l{winning_team} WON THE GAME"
+  victory-subtitle: "&aCongratulations!"
+
+
+
+
+
+
+
+

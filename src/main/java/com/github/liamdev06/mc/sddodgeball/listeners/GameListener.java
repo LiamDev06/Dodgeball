@@ -332,7 +332,7 @@ public class GameListener implements Listener {
             return;
         }
 
-        // Send sound and title
+        // Send sound and title, and clear inventory
         List<GamePlayer> players = game.getPlayers();
         for (GamePlayer gamePlayer : players) {
             Player player = gamePlayer.toPlayer();
@@ -340,6 +340,7 @@ public class GameListener implements Listener {
                 continue;
             }
 
+            player.getInventory().clear();
             SoundHelper.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE);
             MessageHelper.sendTitle(player, "game.victory-title", "game.victory-subtitle", new MsgReplace("winning_team", winningTeam.getDisplayName()));
         }

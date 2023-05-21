@@ -11,6 +11,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -97,17 +98,18 @@ public class MongoUserStorage implements IUserStorage {
     }
 
     @Override
-    public void saveUserToStorage(@NonNull UUID uuid) {
-        if (!this.users.containsKey(uuid)) {
-            return;
-        }
+    public CompletableFuture<Void> saveUserToStorage(@NonNull UUID uuid) {
+        return CompletableFuture.runAsync(() -> {
+            if (!this.users.containsKey(uuid)) {
+                return;
+            }
 
-        // Get user and their document
-        User user = this.users.get(uuid);
+            // Get user and their document
+            User user = this.users.get(uuid);
 
-        CompletableFuture.runAsync(() -> {
             String sUuid = uuid.toString();
-            Document document = this.usersCollection.find(Filters.eq("_id", sUuid)).first();
+            Bson filter = Filters.eq("_id", sUuid);
+            Document document = this.usersCollection.find(filter).first();
 
             boolean newDocument = false;
             if (document == null) {
@@ -116,8 +118,9 @@ public class MongoUserStorage implements IUserStorage {
             }
 
             // Store values
-            for (String key : user.getValues().keySet()) {
-                Object value = user.getValues().get(key);
+            Map<String, Object> values = user.getValues();
+            for (String key : values.keySet()) {
+                Object value = values.get(key);
 
                 if (document.containsKey(key)) {
                     document.replace(key, value);
@@ -130,20 +133,11 @@ public class MongoUserStorage implements IUserStorage {
             if (newDocument) {
                 this.usersCollection.insertOne(document);
             } else {
-                this.usersCollection.replaceOne(Filters.eq("_id", sUuid), document);
+                this.usersCollection.findOneAndReplace(filter, document);
             }
         }).exceptionally(exception -> {
             exception.printStackTrace();
             return null;
-        });
-    }
-
-    @Override
-    public CompletableFuture<Void> saveUsersToStorage() {
-        return CompletableFuture.runAsync(() -> {
-            for (User user : this.users.values()) {
-                this.saveUserToStorage(user.getUuid());
-            }
         });
     }
 

@@ -55,44 +55,38 @@ public class LocalUserStorage implements IUserStorage {
     }
 
     @Override
-    public void saveUserToStorage(@NonNull UUID uuid) {
-        if (!this.users.containsKey(uuid)) {
-            return;
-        }
-
-        // Get user and file
-        User user = this.users.get(uuid);
-        FileConfiguration store = this.userStorage.configuration();
-        String path = "user_data." + uuid.toString() + ".";
-
-        // Store values
-        for (String key : user.getValues().keySet()) {
-            Object value = user.getValues().get(key);
-            store.set(path + key, value);
-        }
-
-        // Save file
-        try {
-            store.save(this.userStorage.configurationFile());
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    @Override
-    public CompletableFuture<Void> saveUsersToStorage() {
+    public CompletableFuture<Void> saveUserToStorage(@NonNull UUID uuid) {
         return CompletableFuture.runAsync(() -> {
-            for (User user : this.users.values()) {
-                this.saveUserToStorage(user.getUuid());
+            if (!this.users.containsKey(uuid)) {
+                return;
             }
-        }, Runnable::run);
+
+            // Get user and file
+            User user = this.users.get(uuid);
+
+            FileConfiguration store = this.userStorage.configuration();
+            String path = "user_data." + uuid + ".";
+
+            // Store values
+            for (String key : user.getValues().keySet()) {
+                Object value = user.getValues().get(key);
+                store.set(path + key, value);
+            }
+
+            // Save file
+            try {
+                store.save(this.userStorage.configurationFile());
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 
     @Override
     public CompletableFuture<User> loadUserFromStorage(@NonNull UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             Map<String, Object> values = new HashMap<>();
-            String path = "user_data." + uuid.toString();
+            String path = "user_data." + uuid;
 
             if (!this.userStorage.contains(path)) {
                 return null;

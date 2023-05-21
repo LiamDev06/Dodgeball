@@ -5,6 +5,7 @@ import com.github.liamdev06.mc.sddodgeball.game.Game;
 import com.github.liamdev06.mc.sddodgeball.game.enums.GameState;
 import com.github.liamdev06.mc.sddodgeball.game.enums.GameTeam;
 import com.github.liamdev06.mc.sddodgeball.managers.world.WorldManager;
+import com.github.liamdev06.mc.sddodgeball.storage.user.User;
 import com.github.liamdev06.mc.sddodgeball.tickhandler.RunnableManager;
 import com.github.liamdev06.mc.sddodgeball.storage.user.storage.LocalUserStorage;
 import com.github.liamdev06.mc.sddodgeball.storage.user.storage.IUserStorage;
@@ -67,7 +68,7 @@ public final class DodgeballPlugin extends JavaPlugin {
         } else {
             this.abort(pluginManager,
                     "*** PlaceholderAPI is not installed or not enabled! ***",
-                    "*** The plugin will not be disabled, please install PlaceholderAPI! ***"
+                    "*** The plugin will now be disabled, please install PlaceholderAPI! ***"
             );
         }
 
@@ -150,12 +151,14 @@ public final class DodgeballPlugin extends JavaPlugin {
 
         // Save all users
         if (this.userStorage == null) {
-            log.severe("There is no instance of the UserManager class! Users could not be saved to the storage!");
+            log.severe("There is no instance of a user manager! Users could not be saved to the storage!");
         } else {
-            this.userStorage.saveUsersToStorage().thenRun(() -> {
-                this.userStorage.handleShutdown();
-                log.info("All users have been saved to storage.");
-            });
+            for (User user : this.userStorage.getUsers().values()) {
+                this.userStorage.saveUserToStorage(user.getUuid()).join(); // Since the server is shutting down this action can be blocking
+            }
+
+            this.userStorage.handleShutdown();
+            log.info("All users have been saved to storage.");
         }
 
         // Save all games to storage

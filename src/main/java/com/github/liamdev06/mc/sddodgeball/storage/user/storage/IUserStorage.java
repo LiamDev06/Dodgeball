@@ -21,9 +21,7 @@ public interface IUserStorage {
      */
     @Nullable User getCachedUser(@NonNull UUID uuid);
 
-    void saveUserToStorage(@NonNull UUID uuid);
-
-    CompletableFuture<Void> saveUsersToStorage();
+    CompletableFuture<Void> saveUserToStorage(@NonNull UUID uuid);
 
     CompletableFuture<User> loadUserFromStorage(@NonNull UUID uuid);
 

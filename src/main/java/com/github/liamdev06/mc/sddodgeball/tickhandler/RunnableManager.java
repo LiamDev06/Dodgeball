@@ -37,11 +37,12 @@ public class RunnableManager {
         if (this.runnables.containsKey(id)) {
             AbstractGameRunnable runnable = this.runnables.get(id);
             BukkitTask task;
+            long ticks = runnable.getTicks();
 
             if (async) {
-                task = new GameBukkitRunnable(runnable).runTaskTimerAsynchronously(this.plugin, runnable.getTicks(), runnable.getTicks());
+                task = new GameBukkitRunnable(runnable).runTaskTimerAsynchronously(this.plugin, ticks, ticks);
             } else {
-                task = new GameBukkitRunnable(runnable).runTaskTimer(this.plugin, runnable.getTicks(), runnable.getTicks());
+                task = new GameBukkitRunnable(runnable).runTaskTimer(this.plugin, ticks, ticks);
             }
 
             runnable.setTask(task);

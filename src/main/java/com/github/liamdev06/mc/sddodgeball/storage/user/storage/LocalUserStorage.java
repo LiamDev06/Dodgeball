@@ -79,7 +79,7 @@ public class LocalUserStorage implements IUserStorage {
             } catch (IOException exception) {
                 exception.printStackTrace();
             }
-        });
+        }, Runnable::run);
     }
 
     @Override
@@ -95,16 +95,9 @@ public class LocalUserStorage implements IUserStorage {
             // Load in values
             ConfigurationSection section = this.userStorage.getSection(path);
             if (section != null) {
-                for (String key : section.getKeys(true)) {
+                for (String key : section.getKeys(false)) {
                     Object value = section.get(key);
-
-                    if (key.length() > 5) {
-                        key = key.substring(5);
-                    }
-
-                    if (value != null) {
-                        values.put(key, value);
-                    }
+                    values.put(key, value);
                 }
             }
 
@@ -115,7 +108,7 @@ public class LocalUserStorage implements IUserStorage {
 
             // Return user
             return user;
-        }).exceptionally(ex -> {
+        }, Runnable::run).exceptionally(ex -> {
             ex.printStackTrace();
             return null;
         });

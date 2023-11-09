@@ -1,6 +1,9 @@
 # SpaceDelta Dodgeball Plugin
 Play a classical game of Dodgeball, eliminate the other team and become the last player standing!
 
+## Purpose
+This project was done in **48 hours** as a Developer application project.
+
 ## Information
 This plugin is a 1.19.4 Spigot plugin not meant for public used. As a part of an application test, it may be removed or made private at any point.
 

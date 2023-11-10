@@ -2,7 +2,7 @@
 Play a classical game of Dodgeball, eliminate the other team and become the last player standing!
 
 ## Purpose
-This project was done in **48 hours** as a Developer application project.
+This plugin was developed as part of an application process to a Minecraft network for a Java Developer position. The time frame was **48 hours** and because of the test requirements, this uses `Spigot` instead  of `Paper`.
 
 ## Information
 This plugin is a 1.19.4 Spigot plugin not meant for public used. As a part of an application test, it may be removed or made private at any point.

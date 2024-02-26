@@ -2,7 +2,7 @@
 Play a classical game of Dodgeball, eliminate the other team and become the last player standing!
 
 ## Purpose
-This plugin was developed as part of an application process to a Minecraft network for a Java Developer position. The time frame was **48 hours** and because of the test requirements, this uses `Spigot` (1.19.4) instead  of `Paper`. This project is not actively maintained nor does it receive support - it is purely an example of my previous work.
+This plugin was developed as part of an application process to a Minecraft network for a Java Developer position. The time frame was **48 hours** and because of the test's requirements, this uses `Spigot` (1.19.4) instead  of `Paper`. This project is not actively maintained nor does it receive support - it is purely an example of my previous work.
 
 ## Features
 - Classical game of Dodgeball including scoreboards, winning effects, game rules and more.

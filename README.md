@@ -1,4 +1,4 @@
-# SpaceDelta Dodgeball Plugin
+# Dodgeball Plugin
 Play a classical game of Dodgeball, eliminate the other team and become the last player standing!
 
 ## Purpose
